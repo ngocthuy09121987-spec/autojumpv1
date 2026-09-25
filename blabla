@@ -1,0 +1,232 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+local autoJump = false
+local keyActivated = false
+local lastJump = 0
+
+for _, v in pairs(CoreGui:GetChildren()) do
+    if v.Name == "AutoJumpGui" then v:Destroy() end
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AutoJumpGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- KEY FRAME
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.new(0, 240, 0, 140)
+keyFrame.Position = UDim2.new(0.5, -120, 0.5, -70)
+keyFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+keyFrame.BorderSizePixel = 0
+keyFrame.Active = true
+keyFrame.Draggable = true
+keyFrame.Parent = screenGui
+
+local kc = Instance.new("UICorner", keyFrame)
+kc.CornerRadius = UDim.new(0, 16)
+local ks = Instance.new("UIStroke", keyFrame)
+ks.Thickness = 2
+ks.Color = Color3.fromRGB(80, 80, 80)
+
+local keyTitle = Instance.new("TextLabel", keyFrame)
+keyTitle.Size = UDim2.new(1, 0, 0, 30)
+keyTitle.Position = UDim2.new(0, 0, 0, 8)
+keyTitle.BackgroundTransparency = 1
+keyTitle.Text = "Nhập Key"
+keyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyTitle.TextScaled = true
+keyTitle.Font = Enum.Font.GothamBold
+
+local keyBox = Instance.new("TextBox", keyFrame)
+keyBox.Size = UDim2.new(0, 200, 0, 36)
+keyBox.Position = UDim2.new(0.5, -100, 0.5, -18)
+keyBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+keyBox.BorderSizePixel = 0
+keyBox.Text = ""
+keyBox.PlaceholderText = "Nhập key..."
+keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+keyBox.TextScaled = true
+keyBox.Font = Enum.Font.Gotham
+local kb = Instance.new("UICorner", keyBox)
+kb.CornerRadius = UDim.new(0, 10)
+
+local confirmBtn = Instance.new("TextButton", keyFrame)
+confirmBtn.Size = UDim2.new(0, 200, 0, 34)
+confirmBtn.Position = UDim2.new(0.5, -100, 0.5, 28)
+confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+confirmBtn.BorderSizePixel = 0
+confirmBtn.Text = "Xác nhận"
+confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmBtn.TextScaled = true
+confirmBtn.Font = Enum.Font.GothamBold
+local cb = Instance.new("UICorner", confirmBtn)
+cb.CornerRadius = UDim.new(0, 10)
+local cs = Instance.new("UIStroke", confirmBtn)
+cs.Thickness = 2
+cs.Color = Color3.fromRGB(0, 255, 0)
+
+local statusLabel = Instance.new("TextLabel", keyFrame)
+statusLabel.Size = UDim2.new(1, 0, 0, 16)
+statusLabel.Position = UDim2.new(0, 0, 1, -20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+statusLabel.TextSize = 12
+statusLabel.Font = Enum.Font.Gotham
+
+-- MAIN FRAME
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 200, 0, 120)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+local mc = Instance.new("UICorner", mainFrame)
+mc.CornerRadius = UDim.new(0, 16)
+local ms = Instance.new("UIStroke", mainFrame)
+ms.Thickness = 2
+ms.Color = Color3.fromRGB(80, 80, 80)
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 5)
+title.BackgroundTransparency = 1
+title.Text = "Menu"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+
+-- NÚT - VÀ X
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 22, 0, 22)
+minimizeBtn.Position = UDim2.new(1, -54, 0, 6)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimizeBtn.BorderSizePixel = 0
+minimizeBtn.Text = "-"
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.TextScaled = true
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.Parent = mainFrame
+local minc = Instance.new("UICorner", minimizeBtn)
+minc.CornerRadius = UDim.new(0, 6)
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 22, 0, 22)
+closeBtn.Position = UDim2.new(1, -28, 0, 6)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextScaled = true
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = mainFrame
+local clc = Instance.new("UICorner", closeBtn)
+clc.CornerRadius = UDim.new(0, 6)
+
+local jumpBtn = Instance.new("TextButton", mainFrame)
+jumpBtn.Size = UDim2.new(0, 160, 0, 40)
+jumpBtn.Position = UDim2.new(0.5, -80, 0.5, -5)
+jumpBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+jumpBtn.BorderSizePixel = 0
+jumpBtn.Text = "Auto Jump"
+jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+jumpBtn.TextScaled = true
+jumpBtn.Font = Enum.Font.GothamBold
+local jc = Instance.new("UICorner", jumpBtn)
+jc.CornerRadius = UDim.new(0, 12)
+local js = Instance.new("UIStroke", jumpBtn)
+js.Thickness = 2
+js.Color = Color3.fromRGB(0, 255, 0)
+
+local devLabel = Instance.new("TextLabel", mainFrame)
+devLabel.Size = UDim2.new(0, 80, 0, 20)
+devLabel.Position = UDim2.new(0, 10, 1, -25)
+devLabel.BackgroundTransparency = 1
+devLabel.Text = "dev 2.0"
+devLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+devLabel.TextSize = 12
+devLabel.Font = Enum.Font.Gotham
+devLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local function updateButton()
+    if autoJump then
+        jumpBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        js.Color = Color3.fromRGB(255, 0, 0)
+    else
+        jumpBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        js.Color = Color3.fromRGB(0, 255, 0)
+    end
+end
+
+-- MINIMIZE / CLOSE
+local minimized = false
+local originalSize = UDim2.new(0, 200, 0, 120)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        originalSize = mainFrame.Size
+        mainFrame.Size = UDim2.new(0, 200, 0, 30)
+        jumpBtn.Visible = false
+        devLabel.Visible = false
+        minimizeBtn.Text = "+"
+    else
+        mainFrame.Size = originalSize
+        jumpBtn.Visible = true
+        devLabel.Visible = true
+        minimizeBtn.Text = "-"
+    end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    autoJump = false
+    keyActivated = false
+    screenGui:Destroy()
+end)
+
+confirmBtn.MouseButton1Click:Connect(function()
+    if keyBox.Text == "autojumpv1" then
+        keyActivated = true
+        keyFrame.Visible = false
+        mainFrame.Visible = true
+    else
+        statusLabel.Text = "Sai key!"
+    end
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+    if not keyActivated then return end
+    autoJump = not autoJump
+    updateButton()
+end)
+
+-- LOGIC NHẢY
+RunService.Heartbeat:Connect(function()
+    if not autoJump then return end
+    local char = player.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    local now = tick()
+    if now - lastJump < 0.35 then return end
+
+    if hum.FloorMaterial ~= Enum.Material.Air then
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        lastJump = now
+    end
+end)
+
+player.CharacterAdded:Connect(function()
+    lastJump = 0
+end)
